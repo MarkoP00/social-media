@@ -6,7 +6,7 @@ import HomeView from "./global/HomeView.vue";
 import SingleUser from "./pages/SingleUser.vue";
 import auth from "./middlewares/auth";
 const router = createRouter({
-    history: createWebHistory(),
+    history: createWebHashHistory(),
 
     routes:[
         {
