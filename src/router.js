@@ -1,4 +1,4 @@
-import { createRouter,createWebHistory } from "vue-router";
+import { createRouter, createWebHashHistory } from "vue-router";
 import LoginAcc from './pages/LoginAcc.vue';
 import CreateAcc from './pages/CreateAcc.vue';
 import MainPage from "./pages/MainPage.vue";
