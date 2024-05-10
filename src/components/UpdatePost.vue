@@ -8,7 +8,7 @@
                     <button @click="closeWindow">Close</button>
                 </div>
                 <div>
-                    <h2>Create new post!</h2>
+                    <h2>Update post!</h2>
                 </div>
                 <div class="btnDone">
                     <button @click="updatePost">Done</button>

@@ -334,8 +334,7 @@ main {
     .postWrapper{
         margin-top: 0px;
     }
-    .userMobButtons button {
-    }
+    
 }
 @media (min-width: 767px){
     .mobileMain{
