@@ -281,7 +281,7 @@ section {
   background-color: #fff;
   padding: 15px 10px;
   right: 4%;
-  top: 10%;
+  top: 12%;
   border-radius: 7px;
   box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.5); 
 }

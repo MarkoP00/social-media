@@ -1,4 +1,5 @@
 <template>
+    <GlobalSpinner v-if="spinnerIsActive" style="z-index: 13" > </GlobalSpinner>
     <section v-if="success === false" style="z-index: 11;">
         <GlobFail></GlobFail>
     </section>
@@ -71,10 +72,12 @@
     import fetchService from '../services/fetchService';
     import GlobSucces from '../global/GlobSucces.vue';
     import GlobFail from '../global/GlobFail.vue';
+    import GlobalSpinner from '../global/GlobalSpinner.vue';
     import { useStore } from 'vuex';
+
     const emits = defineEmits(['close-event']);
     const store = useStore();
-
+    const spinnerIsActive = ref(false);
     const windowVisible = ref(null);
     const success = ref(null);
 
@@ -104,7 +107,6 @@
             postInputData[key].invalid = true;
         }else if(key === 'img1' && postInputData[key].value.includes('http://')){
             postInputData[key].invalid = true;
-            console.log(!postInputData[key].value.includes('http://'));
         }else{
             postInputData[key].invalid = false;
         }
@@ -113,11 +115,12 @@
 
     async function createPost(){
         validateInputFields()
-
+        spinnerIsActive.value = true;
         
     const inputInvalid = Object.keys(postInputData).filter(key => key !== 'img2').some(key => postInputData[key].invalid); 
 
         if(inputInvalid){
+            spinnerIsActive.value = false;
             return;
         }
 
@@ -132,21 +135,26 @@
         const post = await fetchService.post('/social_media/posts', body);
         console.log(post);
         if(post){
+            spinnerIsActive.value = false; 
+
             store.dispatch('addPost', post.data.post);
             store.dispatch('updateSingleUserPostData', post.data.post)
+
             windowVisible.value = false;
             setTimeout(() => {
                 success.value = true;
-            }, 200);
+            }, 400);
 
             setTimeout(() => {
                 emits('close-event')
             }, 2400);
         }else{
+            spinnerIsActive.value = false;
             windowVisible.value = false;
+            
             setTimeout(() => {
                 success.value = false;
-            }, 200);
+            }, 600);
 
             setTimeout(() => {
                 emits('close-event')

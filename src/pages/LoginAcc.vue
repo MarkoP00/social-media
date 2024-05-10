@@ -1,5 +1,6 @@
 <template>
   <GlobalPopup v-if="popTitle" :title="popTitle" :message="popMessage" @close-event="closePopup"></GlobalPopup>
+  <GlobalSpinner v-if="spinnerIsActive" style="background-color: rgba(0,0,0,0.2);"></GlobalSpinner>
   <section v-if="logSuccess">
     <GlobSucces ></GlobSucces>
   </section>
@@ -44,12 +45,14 @@ import GlobalButton from '../global/GlobalButton.vue';
 import fetchService from '../services/fetchService';
 import GlobSucces from '../global/GlobSucces.vue';
 import GlobalPopup from '../global/GlobalPopup.vue';
+import GlobalSpinner from '../global/GlobalSpinner.vue';
 import { useRouter } from 'vue-router';
 import {onMounted, reactive,ref} from 'vue';
 const router = useRouter();
 const popTitle = ref('');
 const popMessage = ref('');
-const formVisible = ref(null)
+const formVisible = ref(null);
+const spinnerIsActive = ref(false);
 const formData = reactive({
   email:{
     value: '',
@@ -76,8 +79,9 @@ const logSuccess = ref(false);
 async function logUser(){
   checkInputs()
   const validationSuccessful = Object.keys(formData).some(key => formData[key].invalid);
-
+  spinnerIsActive.value = true;
   if(validationSuccessful){
+    spinnerIsActive.value = false;
     return
   }
 
@@ -88,6 +92,7 @@ async function logUser(){
   const response = await fetchService.post('/social_media/users/login', body);
 
   if(response){
+    spinnerIsActive.value = false;
     localStorage.setItem('token', response.data.token);
     localStorage.setItem('loggedUserId', response.data.user.id);
     localStorage.setItem('userName', response.data.user.username);
@@ -98,8 +103,9 @@ async function logUser(){
       router.push('/MainPage')
     }, 1500);
   }else{
+    spinnerIsActive.value = false;
     popTitle.value = 'Fail'
-    popMessage.value = 'Something went wrong. Please try again!'
+    popMessage.value = 'Something went wrong. Please, check your email and password!'
   }
 }
 

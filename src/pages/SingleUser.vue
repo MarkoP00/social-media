@@ -46,7 +46,7 @@
                     </div>
                     <div>
                         <button  @click="goBack">Go Back</button>
-                        <button v-if="sameUser" @click="toggleShowSettings">Change Profile</button>
+                        <button v-if="sameUser" @click="toggleShowSettings" style="margin-left: 20px;">Change Profile</button>
                     </div>
                 </div>
         </div>
@@ -129,6 +129,8 @@ async function followUser(userID){
     const response = await fetchService.post(`/social_media/users/follow/${userID}`);
     console.log(response);
     followingUser.value = !followingUser.value;
+
+    getUser()
 }
 
 function checkUser(){
@@ -331,6 +333,8 @@ main {
     }
     .postWrapper{
         margin-top: 0px;
+    }
+    .userMobButtons button {
     }
 }
 @media (min-width: 767px){

@@ -1,4 +1,5 @@
 <template>
+    <GlobalSpinner v-if="spinnerIsActive" style="z-index: 21"></GlobalSpinner>
     <section class="createContainer" @click="closeWindow">
         <Transition name="event">
         <div class="contentContainer" v-if="windowVisible" @click.stop>
@@ -69,6 +70,7 @@
     import GlobalButton from '../global/GlobalButton.vue';
     import GlobSucces from '../global/GlobSucces.vue';
     import GlobFail from '../global/GlobFail.vue';
+    import GlobalSpinner from '../global/GlobalSpinner.vue';
     import { useStore } from 'vuex';
     const store = useStore();
     // import { useStore } from 'vuex/types/index.js';
@@ -81,7 +83,9 @@
     const postData = ref([]);
     const windowVisible = ref(null);
     const showSuccess = ref(false);
-    const showFail = ref(false)
+    const showFail = ref(false);
+    const spinnerIsActive = ref(false);
+
     const postInputData = reactive({
             img1: {
                 value: '',
@@ -99,6 +103,7 @@
     })
 
 async function updatePost(){
+    spinnerIsActive.value = true;
     let images = postInputData.img2.value ? [postInputData.img1.value, postInputData.img2.value] : [postInputData.img1.value];
 
     if(!postInputData.img1.value){
@@ -114,6 +119,7 @@ async function updatePost(){
     const response = await fetchService.patch(`/social_media/posts/${props.postID}`, body);
     
     if(response !== undefined){
+        spinnerIsActive.value = false;
         store.dispatch('findPostAndUpdate', response.data.post);
         windowVisible.value = false;
         setTimeout(() => {
@@ -123,8 +129,14 @@ async function updatePost(){
             emits('close-event')
         }, 2000);
     }else{
-        emits('close-event')
-        alert('Something went wrong! Please try again :(')
+        windowVisible.value = false;
+        spinnerIsActive.value = false;
+        setTimeout(() => {
+            showFail.value = true;
+        }, 600);
+        setTimeout(() => {
+            emits('close-event')
+        }, 2200);
     }
 }
 

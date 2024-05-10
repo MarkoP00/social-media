@@ -1,7 +1,9 @@
 <template>
   <GlobalPopup @close-event="closePopup" v-if="popTitle" :title="popTitle" :message="popMessage"></GlobalPopup>
+  <GlobalSpinner v-if="spinnerIsActive" style="background-color: rgba(0,0,0,0.2);"></GlobalSpinner>
     <section>
-      <form :class="{errorActive : errorActive}" @keydown.enter="createUser">
+      <Transition name="fade">
+      <form :class="{errorActive : errorActive}" @keydown.enter="createUser" v-if="formVisible">
         <div class="formContent" >
             <div class="title">
                 <h1>Create account</h1>
@@ -46,6 +48,7 @@
           </div>
         </div>
       </form>
+    </Transition>
     </section>
   </template>
 
@@ -53,12 +56,15 @@
 <script setup>
 import GlobalButton from '../global/GlobalButton.vue';
 import fetchService from '../services/fetchService';
-import {reactive,ref} from 'vue';
+import GlobalSpinner from '../global/GlobalSpinner.vue';
 import GlobalPopup from '../global/GlobalPopup.vue';
+import {onMounted, reactive,ref} from 'vue';
 
 const errorActive = ref(false);
 const popTitle = ref('');
 const popMessage = ref('');
+const spinnerIsActive = ref(false);
+const formVisible = ref(null);
 const formData = reactive({
   username: {
     value: '',
@@ -108,8 +114,11 @@ async function createUser(){
   validateInputFields();
 
   const validationSuccessful = Object.keys(formData).some(key => formData[key].invalid)
+  spinnerIsActive.value = true;
   
   if(validationSuccessful){
+  spinnerIsActive.value = false;
+
     return
   }
 
@@ -123,9 +132,12 @@ async function createUser(){
   const user = await fetchService.post('/social_media/users', body);
 
   if(user === undefined){
+    spinnerIsActive.value = false;
     popTitle.value = 'Fail';
-    popMessage.value = 'Oops! Please try again'
+    popMessage.value = 'Oops! Please try again';
+
   }else if(user){
+    spinnerIsActive.value = false;
     popTitle.value = 'Success';
     popMessage.value = 'You have successfully created your account. Please proceed to login!';
   }
@@ -134,7 +146,13 @@ async function createUser(){
 function closePopup(){
   popTitle.value = ''
 }
+function showForm(){
+  formVisible.value = true;
+}
 
+onMounted(() => {
+  showForm()
+})
 </script>
 
 <style scoped>
@@ -210,6 +228,18 @@ form{
 .wrong input{
   border: 1px solid red;
 }
+.fade-enter-from, .fade-leave-to{
+        opacity: 0;
+        transform: scale(0.7);
+    }
+    .fade-enter-active, .fade-leave-active{
+        transition: all 0.4s ease;
+    }
+    .fade-enter-to, .fade-leave-from{
+        opacity: 1;
+        transform: scale(1);
+    }
+
 @media (max-width: 426px){
   form{
     width: 350px;
